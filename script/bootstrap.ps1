@@ -60,7 +60,7 @@ Write-Output -InputObject "Creating Conda virtual environment..."
 Invoke-Expression -Command "conda create -n nwmlworkshop python=3.6 -y"
 
 Write-Output -InputObject "Initializing Conda for PowerShell..."
-(& "C:\Users\milleq2\Miniconda3\Scripts\conda.exe" "shell.powershell" "hook") | Out-String | Invoke-Expression
+(& "conda.exe" "shell.powershell" "hook") | Out-String | Invoke-Expression
 
 Write-Output -InputObject "Activating the Conda virtual environment..."
 Invoke-Expression -Command "conda activate nwmlworkshop"
