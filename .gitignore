@@ -1,5 +1,5 @@
 # Ignore the repository's temporary directory.
 /temp/
 
-#Ignore ipython notebook checkpoint
-*-checkpoint.ipynb
+# Ignore Jupyter Notebook files.
+*.ipynb
