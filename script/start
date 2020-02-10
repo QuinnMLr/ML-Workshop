@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#
+# Start required processes for the repository locally.
+#
+# Links:
+# - https://github.com/github/scripts-to-rule-them-all
+
+# Set shell option to exit immediately if an error occurs.
+set -e
+
+# Navigate to the repository's root directory.
+cd "$(dirname "$0")/.."
+
+# Load the repository-specific environment configuration.
+source ".envrc"
+
+# Set the path of the notebook directory.
+_notebook_home="${repository_root}/notebook"
+
+# Set up the conda hook.
+echo "Setting up the conda hook..."
+eval "$("${miniconda3_home}/bin/conda" "shell.bash" "hook")"
+
+# Activate the Miniconda3 environment.
+echo "Activating the Miniconda3 environment..."
+conda activate "$miniconda3_environment_name"
+
+# Start the Jupyter Notebook server.
+echo "Starting the Jupyter Notebook server..."
+jupyter notebook --notebook-dir="$_notebook_home"
+
+# Remove variables that are not needed externally.
+unset _notebook_home
+unset data_home
+unset miniconda3_environment_name
+unset miniconda3_home
+unset temporary_home

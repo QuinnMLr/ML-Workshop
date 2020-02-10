@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+#
+# Resolve all dependencies that the repository requires to run.
+#
+# Links:
+# - https://github.com/github/scripts-to-rule-them-all
+
+# Set shell option to exit immediately if an error occurs.
+set -e
+
+# Navigate to the repository's root directory.
+cd "$(dirname "$0")/.."
+
+# Load the repository-specific environment configuration.
+source ".envrc"
+
+# Determine the current operating system and architecture.
+if test "$(uname -s)" = "Darwin"; then
+    _miniconda3_os_name="MacOSX"
+
+    if test "$(uname -m)" = "x86_64"; then
+        _miniconda3_architecture_name="x86_64"
+    else
+        echo "Error: Only 64-bit architecture is supported for the macOS operating system."
+        exit 1
+    fi
+elif test "$(uname -s)" = "Linux"; then
+    _miniconda3_os_name="Linux"
+
+    if test "$(uname -m)" = "i686"; then
+        _miniconda3_architecture_name="x86"
+    elif test "$(uname -m)" = "x86_64"; then
+        _miniconda3_architecture_name="x86_64"
+    else
+        echo "Error: Only 32-bit or 64-bit architectures are supported for the Linux operating system."
+        exit 1
+    fi
+else
+    echo "Error: Only the Linux or macOS operating systems are supported."
+    exit 1
+fi
+
+# Set the Python version for the Miniconda3 environment.
+_miniconda3_environemnt_python_version="$(cat "${repository_root}/.miniconda3-environment-python-version")"
+
+# Set the Miniconda3 version to install.
+_miniconda3_version="$(cat "${repository_root}/.miniconda3-version")"
+
+# Set the name of the Miniconda3 installer.
+_miniconda3_installer_name="Miniconda3-${_miniconda3_version}-${_miniconda3_os_name}-${_miniconda3_architecture_name}.sh"
+
+# Set the file system path of the Miniconda3 installer.
+_miniconda3_installer_path="${temporary_home}/${_miniconda3_installer_name}"
+
+# Set the URL of the Minconda3 installer.
+_miniconda3_installer_url="https://repo.anaconda.com/miniconda/${_miniconda3_installer_name}"
+
+# Create the repository's temporary directory if it does not already exist.
+echo "Creating the repository's temporary directory if it does not already exist..."
+test -d "$temporary_home" || mkdir -p "$temporary_home"
+
+# Download the Miniconda3 installer if it is not already downloaded.
+echo "Downloading the Miniconda3 installer..."
+test -f "$_miniconda3_installer_path" || curl --fail --location --output "$_miniconda3_installer_path" "$_miniconda3_installer_url"
+
+# Create the data directory if it does not already exist.
+echo "Creating the parent directory for the Miniconda3 installation directory if it does not already exist..."
+test -d "$data_home" || mkdir -p "$data_home"
+
+# Run the Miniconda3 installer.
+echo "Running the Miniconda3 installer..."
+sh "$_miniconda3_installer_path" -b -p "$miniconda3_home"
+
+# Set up the conda hook.
+echo "Setting up the conda hook..."
+eval "$("${miniconda3_home}/bin/conda" "shell.bash" "hook")"
+
+# Create the Miniconda3 environment.
+echo "Creating the Miniconda3 environment..."
+conda create --yes --name "$miniconda3_environment_name" python="$_miniconda3_environemnt_python_version"
+
+# Activate the Miniconda3 environment.
+echo "Activating the Miniconda3 environment..."
+conda activate "$miniconda3_environment_name"
+
+# Install conda requirements in the Miniconda3 environment.
+echo "Installing conda requirements in the Miniconda3 environment..."
+while read _conda_requirement; do
+    conda install --yes "$_conda_requirement";
+done < "${repository_root}/requirements.conda.txt"
+
+# Install pip requirements in the Miniconda3 environment.
+echo "Installing pip requirements in the Miniconda3 environment..."
+pip install --requirement "${repository_root}/requirements.txt"
+
+# Remove variables that are not needed externally.
+unset _conda_requirement
+unset _miniconda3_architecture_name
+unset _miniconda3_environemnt_python_version
+unset _miniconda3_installer_name
+unset _miniconda3_installer_path
+unset _miniconda3_installer_url
+unset _miniconda3_os_name
+unset _miniconda3_version
+unset data_home
+unset miniconda3_environment_name
+unset miniconda3_home
+unset repository_root
+unset temporary_home
