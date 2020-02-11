@@ -1,4 +1,4 @@
-# ML-Workshop
+# Nationwide-ML-Workshop
 
 This repository contains resources for participants of the BGSU Machine Learning Workshop hosted by Nationwide.
 
