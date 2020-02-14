@@ -7,10 +7,10 @@
 $ErrorActionPreference = "Stop"
 
 # Set URLs and file system paths.
+$RootDirectoryPath = Split-Path -Path "$PSScriptRoot" -Parent
 $CondaRequirementsFilePath = Join-Path -Path "$RootDirectoryPath" -ChildPath "requirements.conda.txt"
 $Miniconda3InstallationDirectoryPath = Join-Path -Path "$env:UserProfile" -ChildPath "Miniconda3"
 $PipRequirementsFilePath = Join-Path -Path "$RootDirectoryPath" -ChildPath "requirements.txt"
-$RootDirectoryPath = Split-Path -Path "$PSScriptRoot" -Parent
 $TemporaryDirectoryPath = Join-Path -Path "$RootDirectoryPath" -ChildPath "temp"
 
 # Set base URL of the Minconda3 installer..
