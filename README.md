@@ -28,6 +28,14 @@ This repository contains resources for participants of the BGSU Machine Learning
 
 - Run the bootstrap script to install software dependencies for workshop
 
+**On Windows, Execute the following command**
+
+  ```bash
+  script\bootstrap
+  ```
+  
+  **On Mac and Linux, Execute the following command**
+
   ```bash
   script/bootstrap
   ```
@@ -41,6 +49,14 @@ This repository contains resources for participants of the BGSU Machine Learning
   ```
 
 - Run the start script to start a [Jupyter](https://jupyter.org/) Notebook server for workshop
+
+**On Windows, Execute the following command**
+
+  ```bash
+  script\start
+  ```
+  
+  **On Mac and Linux, Execute the following command**
 
   ```bash
   script/start
