@@ -1,8 +1,15 @@
+# Resolve all dependencies that the repository requires to run.
+#
+# Links:
+# - https://github.com/github/scripts-to-rule-them-all
+
 # Set error action preference to stop if an error occurs.
 $ErrorActionPreference = "Stop"
 
 # Set URLs and file system paths.
+$CondaRequirementsFilePath = Join-Path -Path "$RootDirectoryPath" -ChildPath "requirements.conda.txt"
 $Miniconda3InstallationDirectoryPath = Join-Path -Path "$env:UserProfile" -ChildPath "Miniconda3"
+$PipRequirementsFilePath = Join-Path -Path "$RootDirectoryPath" -ChildPath "requirements.txt"
 $RootDirectoryPath = Split-Path -Path "$PSScriptRoot" -Parent
 $TemporaryDirectoryPath = Join-Path -Path "$RootDirectoryPath" -ChildPath "temp"
 
@@ -10,7 +17,13 @@ $TemporaryDirectoryPath = Join-Path -Path "$RootDirectoryPath" -ChildPath "temp"
 $Miniconda3InstallerBaseUrl = "https://repo.anaconda.com/miniconda"
 
 # Set the version of the Minconda3 distribution to use.
-$Minconda3Version = "4.7.12.1"
+$Minconda3Version = Get-Content -Path (Join-Path -Path "$RootDirectoryPath" -ChildPath ".miniconda3-version")
+
+# Set the name of the Miniconda3 environment.
+$Minconda3EnvironmentName = Get-Content -Path (Join-Path -Path "$RootDirectoryPath" -ChildPath ".miniconda3-environment-name")
+
+# Set the version of Python for the Miniconda3 environment.
+$Minconda3EnvironmentPythonVersion = Get-Content -Path (Join-Path -Path "$RootDirectoryPath" -ChildPath ".miniconda3-environment-python-version")
 
 # Set architecture-specific variables.
 if ([System.Environment]::Is64BitOperatingSystem)
@@ -38,6 +51,7 @@ else
     Write-Output -InputObject "The repository's temporary directory already exists."
 }
 
+# Download the Miniconda3 installer if it does not already exist.
 if (!(Test-Path -Path "$Minconda3InstallerPath" -Type "Leaf"))
 {
     Write-Output -InputObject "Downloading the Minconda3 installer..."
@@ -48,25 +62,36 @@ else
     Write-Output -InputObject "The Minconda3 installer already is already downloaded..."
 }
 
+# Run the Miniconda3 installer.
 Write-Output -InputObject "Running the Minconda3 installer..."
 Invoke-Expression -Command "${Minconda3InstallerPath} /S /InstallationType=JustMe /RegisterPython=0 /AddToPath=1 /NoRegistry=1 /D=${Miniconda3InstallationDirectoryPath}"
 
+# Keep refreshing the `Path` environment variable until the `conda` command is
+# found.
 while (!(Get-Command "conda" -ErrorAction "SilentlyContinue"))
 {
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 }
 
-Write-Output -InputObject "Creating Conda virtual environment..."
-Invoke-Expression -Command "conda create -n nwmlworkshop python=3.6 -y"
+# Create the Miniconda3 environment.
+Write-Output -InputObject "Creating the Miniconda3 environment..."
+Invoke-Expression -Command "conda create -n ${Minconda3EnvironmentName} python=${Minconda3EnvironmentPythonVersion} -y"
 
-Write-Output -InputObject "Initializing Conda for PowerShell..."
+# Set up the conda hook.
+Write-Output -InputObject "Setting up the conda hook..."
 (& "conda.exe" "shell.powershell" "hook") | Out-String | Invoke-Expression
 
-Write-Output -InputObject "Activating the Conda virtual environment..."
-Invoke-Expression -Command "conda activate nwmlworkshop"
+# Activate the Miniconda3 environment.
+Write-Output -InputObject "Activating the Miniconda3 environment..."
+Invoke-Expression -Command "conda activate ${Minconda3EnvironmentName}"
 
-Write-Output -InputObject "Installing dependencies..."
-Invoke-Expression -Command "conda install jupyter -y"
-Invoke-Expression -Command "conda config --append channels conda-forge"
-Invoke-Expression -Command "conda install -c h2oai h2o -y"
-Invoke-Expression -Command "pip install h2o"
+# Install conda requirements in the Miniconda3 environment.
+Write-Output -InputObject "Installing conda requirements in the Miniconda3 environment..."
+foreach ($CondaRequirement in Get-Content -Path "$CondaRequirementsFilePath")
+{
+    Invoke-Expression -Command "conda install --yes '${CondaRequirement}'"
+}
+
+# Install pip requirements in the Miniconda3 environment.
+Write-Output -InputObject "Installing pip requirements in the Miniconda3 environment..."
+Invoke-Expression -Command "pip install --requirement '${PipRequirementsFilePath}'"
