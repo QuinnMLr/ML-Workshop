@@ -32,7 +32,7 @@ Write-Output -InputObject "Setting up the conda hook..."
 (& "conda.exe" "shell.powershell" "hook") | Out-String | Invoke-Expression
 
 # Activate the Miniconda3 environment.
-Write-Output -InputObject "Activating the Miniconda3 environment..."
+Write-Output -InputObject "Activating the Conda Virtual environment..."
 Invoke-Expression -Command "conda activate ${Minconda3EnvironmentName}"
 
 # Start the Jupyter Notebook server.
