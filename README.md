@@ -17,13 +17,13 @@ This repository contains resources for participants of the BGSU Machine Learning
 - Clone this repository:
 
   ```bash
-  git clone https://github.com/QuinnMLr/ML-Workshop.git
+  git clone https://github.com/QuinnMLr/Nationwide-DS-Workshop.git
   ```
 
 - Navigate to the root directory of the cloned repository
 
   ```bash
-  cd ML-Workshop
+  cd Nationwide-DS-Workshop
   ```
 
 - Run the bootstrap script to install software dependencies for workshop
@@ -45,7 +45,7 @@ This repository contains resources for participants of the BGSU Machine Learning
 - Navigate to the root directory of the cloned repository (Replace `<DIRECTORY-PATH>` with path of the directory containing the cloned repository)
 
   ```bash
-  cd <DIRECTORY-PATH>/ML-Workshop
+  cd <DIRECTORY-PATH>/Nationwide-DS-Workshop
   ```
 
 - Run the start script to start a [Jupyter](https://jupyter.org/) Notebook server for workshop
