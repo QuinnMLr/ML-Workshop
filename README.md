@@ -2,6 +2,8 @@
 
 This repository contains resources for participants of the BGSU Machine Learning Workshop hosted by Nationwide.
 
+# Reach out to quinnmiller68@gmail.com for any questions regarding the workshop or software
+
 ## Installation
 
 - Before installation, ensure your machine has the following software:
